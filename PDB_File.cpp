@@ -1053,7 +1053,6 @@ int PDB_File::PDB_To_XYZ_AMI_CLE(const string &fn,char ori_id) // given chain
 	ws_dead_chain=-1;  // default[-1] 
 	Found_AMI=0;       // default[not found] 
 	ws_exclaim=0;      // default[no exclaim] 
-	PDB_num_rec=0;     //__070230__// 
 	FirstRes=1;        //__080808__// 
 	//--- vector init ---//__110230__//
 	//[normal data]
@@ -1065,6 +1064,7 @@ int PDB_File::PDB_To_XYZ_AMI_CLE(const string &fn,char ori_id) // given chain
 	PDB_cle_rec.clear();
 	PDB_r_point.clear();
 	PDB_output.clear();
+	PDB_num_rec=0;     //__070230__//
 	//[temp data]
 	WS_TOTAL_CHAIN.clear();
 	WS_NAME_CHAIN.clear();
@@ -1288,7 +1288,18 @@ wsbegin:
 		posxt=posyt=poszt=0.0;   
 		FirstTime=1; 
 		FirstRes=1;  //__070811__// 
-		if(ws_exclaim==0)PDB_num_rec=0;    //__070230__// 
+		if(ws_exclaim==0)
+		{
+			PDB_int_rec.clear();
+			PDB_ins_rec.clear();
+			PDB_tag_rec.clear();
+			PDB_chn_rec.clear();
+			PDB_ami_rec.clear();
+			PDB_cle_rec.clear();
+			PDB_r_point.clear();
+			PDB_output.clear();
+			PDB_num_rec=0;    //__070230__// 
+		}
 		wscount=0; 
 		//__080306__//---process CA_only condition---// 
 		Has_CA=1;    //default has CA 
