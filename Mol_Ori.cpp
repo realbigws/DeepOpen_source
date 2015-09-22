@@ -631,29 +631,32 @@ int Mol_Ori::XYZ_Input(string &file,string &range,int form,int &moln,XYZ *mol,ch
 				}
 				//----- we need to printf WARNING here -------//end
 
+				int moln_;
 				int min_num=9999999;
 				int min_cat=-1;
 				int PRE_LOAD_=PRE_LOAD;
 				PRE_LOAD=1;
 				//head
+				moln_=0;
 				ret_val=Upload_Process(file,chain,chain_bak,PDBorSEQ,tag,
-					-1,'@',tail_tag,tail_c,moln,0,0,0,0,0);
+					-1,'@',tail_tag,tail_c,moln_,0,0,0,0,0);
 				if(ret_val==1)
 				{
-					if(moln<min_num)
+					if(moln_<min_num)
 					{
-						min_num=moln;
+						min_num=moln_;
 						min_cat=0;  //-> head
 					}
 				}
 				//tail
+				moln_=0;
 				ret_val=Upload_Process(file,chain,chain_bak,PDBorSEQ,tag,
-					head_tag,head_c,-1,'@',moln,0,0,0,0,0);
+					head_tag,head_c,-1,'@',moln_,0,0,0,0,0);
 				if(ret_val==1)
 				{
-					if(moln<min_num)
+					if(moln_<min_num)
 					{
-						min_num=moln;
+						min_num=moln_;
 						min_cat=1;  //-> tail
 					}
 				}

@@ -98,7 +98,6 @@ int PDB_File::Input_XYZ_MINI_II(int PS,int mode,int st,char stt,int ed,char edd,
 
 	//--check--//
 	if(totnu<0)return RANGEOVER_ERROR;
-	if(chain!='!')totnu=0;
 	count=totnu;
 
 	//assign_head_tail

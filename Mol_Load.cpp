@@ -17,10 +17,12 @@ Mol_Load::~Mol_Load(void)
 int Mol_Load::Upload_Process(string &file,char chain,char chain_bak,int PDBorSEQ,int tag,
 	int head_tag,int head_c,int tail_tag,int tail_c,int &moln,XYZ *mol,char *AMI,char *CLE,char *ind,PDB_Residue *pdb)
 {
+	int moln_;
 	int ret_val;
 	if(PRE_LOAD==1)
 	{
-		ret_val=Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln,0,0,0,0,0);
+		moln_=0;
+		ret_val=Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln_,0,0,0,0,0);
 		if(ret_val!=1)return ret_val;      //means partially failed(upload mode)
 		Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln,mol,AMI,CLE,ind,pdb);
 		return 1;
@@ -47,7 +49,8 @@ int Mol_Load::Upload_Process(string &file,char chain,char chain_bak,int PDBorSEQ
 	{
 		//memory limit
 		if(PDB_num_rec>MEMORY_LIMIT)return -12345; //memory limit !!
-		ret_val=Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln,0,0,0,0,0);
+		moln_=0;
+		ret_val=Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln_,0,0,0,0,0);
 		if(ret_val!=1)return ret_val;      //means partially failed(upload mode)
 		Input_XYZ_MINI_II(PDBorSEQ,tag,head_tag,head_c,tail_tag,tail_c,chain,moln,mol,AMI,CLE,ind,pdb);
 	}
