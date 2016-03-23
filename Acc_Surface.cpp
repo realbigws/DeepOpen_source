@@ -39,9 +39,6 @@ void Acc_Surface::AC_Init(int AC_MAXIMAL)
 	AC_output=new int[AC_MAXIMAL];
 	AC_normal=new int[AC_MAXIMAL];
 	//process temporary
-	//[icosahedron]
-	icosahedron_p=new XYZ[AC_MAXIMAL];
-	icosahedron_a=new double[AC_MAXIMAL];
 	//[minmaxbox & res_neibor]
 	AC_mol_boxmin=new XYZ[AC_MAXIMAL];
 	AC_mol_boxmax=new XYZ[AC_MAXIMAL];
@@ -60,9 +57,6 @@ void Acc_Surface::AC_Dele(int AC_MAXIMAL)
 	delete [] AC_output;
 	delete [] AC_normal;
 	//process temporary
-	//[icosahedron]
-	delete [] icosahedron_p;
-	delete [] icosahedron_a;
 	//[minmaxbox & res_neibor]
 	delete [] AC_mol_boxmin;
 	delete [] AC_mol_boxmax;
@@ -121,7 +115,8 @@ void Acc_Surface::AC_Triangle(XYZ x1, XYZ x2, XYZ x3,long level)
 	x6.xyz2double(vect);
 	xnorm=Vector_Normalize(vect,3);
 	x6.double2xyz(vect);
-	icosahedron_p[icosahedron_n]=x6;
+	//-> push_back operation here for icosahedron_p
+	icosahedron_p.push_back(x6);
 	x5=x3-x1;
 	x4=x2-x1;
 	x5.xyz2double(x);
@@ -131,7 +126,8 @@ void Acc_Surface::AC_Triangle(XYZ x1, XYZ x2, XYZ x3,long level)
 	x6.xyz2double(vect);
 	xnorm=Vector_Normalize(vect,3);
 	x6.double2xyz(vect);
-	icosahedron_a[icosahedron_n]=xnorm / 2.0;
+	//-> push_back operation here for icosahedron_a
+	icosahedron_a.push_back(xnorm / 2.0);
 	icosahedron_n++;
 }
 //[calculate icosahedron]
@@ -163,6 +159,8 @@ void Acc_Surface::AC_Init_Icosahedron(int order)
 		}
 	}
 	icosahedron_n = 0;
+	icosahedron_p.clear();
+	icosahedron_a.clear();
 	level = order;
 	/* GET ALL 20 FACES OF ICOSAHEDRON */
 	for (i = 0; i <= 9; i++) 

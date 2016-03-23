@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "Computation_Utility.h"
 #include "XYZ.h"
 
@@ -24,8 +25,8 @@ public:
 	//inner icosahedron
 	int icosahedron_order; //order (determine total number) -> default: 2 (4^2)
 	int icosahedron_n;     //total number                   -> default: 320 (20*4*4)
-	XYZ *icosahedron_p;    //XYZ coordinate
-	double *icosahedron_a; //point area
+	vector <XYZ> icosahedron_p;    //XYZ coordinate
+	vector <double> icosahedron_a; //point area
 	//acc calculate (res_level)
 	XYZ *AC_mol_boxmin;    //boxmin around the residue
 	XYZ *AC_mol_boxmax;    //boxmax around the residue
