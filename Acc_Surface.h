@@ -30,14 +30,14 @@ public:
 	//acc calculate (res_level)
 	XYZ *AC_mol_boxmin;    //boxmin around the residue
 	XYZ *AC_mol_boxmax;    //boxmax around the residue
-	int AC_res_neibor_n;   //total residue neibor
 	int *AC_res_neibor_p;  //position of residue neibor
+	int AC_res_neibor_n;   //total residue neibor
 	//acc calculate (atom_level)
 	XYZ AC_atom_center;    //atom center
 	double AC_atom_radii;  //atom center radii
 	int AC_neibor_n;       //total neibor
-	XYZ *AC_neibor_p;      //XYZ coordinate of neibor
-	double *AC_neibor_a;   //neibor area
+	vector <XYZ> AC_neibor_p;      //XYZ coordinate of neibor
+	vector <double> AC_neibor_a;   //neibor area
 
 	//[input/output]
 	//solvent accessibility structure

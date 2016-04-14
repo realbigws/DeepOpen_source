@@ -33,7 +33,7 @@ void Acc_Surface::AC_Init(int AC_MAXIMAL)
 {
 	//input & output
 	NewArray2D(&AC_mol,AC_MAXIMAL,4);
-	AC_sidechain=new XYZ[AC_MAXIMAL*10];
+	AC_sidechain=new XYZ[AC_MAXIMAL*11];
 	AC_side_rec=new int[AC_MAXIMAL];
 	AC_side_num=new int[AC_MAXIMAL];
 	AC_output=new int[AC_MAXIMAL];
@@ -43,9 +43,6 @@ void Acc_Surface::AC_Init(int AC_MAXIMAL)
 	AC_mol_boxmin=new XYZ[AC_MAXIMAL];
 	AC_mol_boxmax=new XYZ[AC_MAXIMAL];
 	AC_res_neibor_p=new int[AC_MAXIMAL];
-	//[atomic neibor]
-	AC_neibor_p=new XYZ[AC_MAXIMAL];
-	AC_neibor_a=new double[AC_MAXIMAL];
 }
 void Acc_Surface::AC_Dele(int AC_MAXIMAL)
 {
@@ -61,9 +58,6 @@ void Acc_Surface::AC_Dele(int AC_MAXIMAL)
 	delete [] AC_mol_boxmin;
 	delete [] AC_mol_boxmax;
 	delete [] AC_res_neibor_p;
-	//[atomic neibor]
-	delete [] AC_neibor_p;
-	delete [] AC_neibor_a;
 }
 
 //-------------------- input & init-------------------//
@@ -273,8 +267,9 @@ void Acc_Surface::AC_Calc_AtomNeib_Single(XYZ v,double r,double dist)
 	if (dist <= 0.00001) //#define EPS             0.00001
 	return;
 	//add_neibor
-	AC_neibor_p[AC_neibor_n]=v-AC_atom_center;
-	AC_neibor_a[AC_neibor_n]=(AC_atom_radii*AC_atom_radii-r*r+dist)/(2*AC_atom_radii);
+	AC_neibor_p.push_back( v-AC_atom_center );
+	AC_neibor_a.push_back( (AC_atom_radii*AC_atom_radii-r*r+dist)/(2*AC_atom_radii) );
+	//check_neibor
 	if(AC_neibor_a[AC_neibor_n]<AC_neibor_a[0])
 	{
 		XYZ tmp;
@@ -298,6 +293,8 @@ int Acc_Surface::AC_Calc_AtomNeib(XYZ v,double r)
 	double dist;
 	//init
 	AC_neibor_n=0;
+	AC_neibor_p.clear();
+	AC_neibor_a.clear();
 	AC_atom_center=v;
 	AC_atom_radii=r;
 	//collect nearby residue
