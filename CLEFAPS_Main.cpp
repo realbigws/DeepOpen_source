@@ -1614,8 +1614,30 @@ ws_end:
 	stable_sort(FM_align_tot.rbegin(),FM_align_tot.rend());   //descending sort
 	for(k=0;k<moln2;k++)ali2_[k]=FM_align_tot[0].alignment[k];
 	EqualArray(TM_FINMAT,finmat,12);
+	TM_BEST=FM_align_tot[0].TMsco;
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);
 	if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
+
+	//---- final add ----//__2016.05.30__//
+	{
+		//kill
+		vector <Align_Record> FM_align_tot_;
+		for(int kk=0;kk<(int)FM_align_tot.size();kk++)
+		{
+			for(int i=0;i<moln2;i++)TM_Main_Ali2[i]=FM_align_tot[kk].alignment[i];
+			for(int i=0;i<12;i++)TM_rotmat[i]=FM_align_tot[kk].rotmat[i];
+			TM_CUR=FM_align_tot[kk].main_sco;
+			Alimeng_Add(FM_align_tot_,moln2,TM_CUR);
+		}
+		//add
+		FM_align_tot.clear();
+		for(int kk=0;kk<(int)FM_align_tot_.size();kk++)
+		{
+			FM_align_tot.push_back(FM_align_tot_[kk]);
+		}
+	}
+
+	//return
 	return TM_BEST;
 }
 
@@ -1776,8 +1798,30 @@ ws_end:
 	stable_sort(FM_align_tot.rbegin(),FM_align_tot.rend());   //descending sort
 	for(k=0;k<moln2;k++)ali2_[k]=FM_align_tot[0].alignment[k];
 	EqualArray(TM_FINMAT,finmat,12);
+	TM_BEST=FM_align_tot[0].TMsco;
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);
 	if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
+
+	//---- final add ----//__2016.05.30__//
+	{
+		//kill
+		vector <Align_Record> FM_align_tot_;
+		for(int kk=0;kk<(int)FM_align_tot.size();kk++)
+		{
+			for(int i=0;i<moln2;i++)TM_Main_Ali2[i]=FM_align_tot[kk].alignment[i];
+			for(int i=0;i<12;i++)TM_rotmat[i]=FM_align_tot[kk].rotmat[i];
+			TM_CUR=FM_align_tot[kk].main_sco;
+			Alimeng_Add(FM_align_tot_,moln2,TM_CUR);
+		}
+		//add
+		FM_align_tot.clear();
+		for(int kk=0;kk<(int)FM_align_tot_.size();kk++)
+		{
+			FM_align_tot.push_back(FM_align_tot_[kk]);
+		}
+	}
+
+	//return
 	return TM_BEST;
 }
 
@@ -1832,8 +1876,30 @@ double CLEFAPS_Main::FM_Align_WithAli(XYZ *mol1,XYZ *mol2,int moln1,int moln2,in
 	stable_sort(FM_align_tot.rbegin(),FM_align_tot.rend());   //descending sort
 	for(k=0;k<moln2;k++)ali2_[k]=FM_align_tot[0].alignment[k];
 	EqualArray(TM_FINMAT,finmat,12);
+	TM_BEST=FM_align_tot[0].TMsco;
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);
 	if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
+
+	//---- final add ----//__2016.05.30__//
+	{
+		//kill
+		vector <Align_Record> FM_align_tot_;
+		for(int kk=0;kk<(int)FM_align_tot.size();kk++)
+		{
+			for(int i=0;i<moln2;i++)TM_Main_Ali2[i]=FM_align_tot[kk].alignment[i];
+			for(int i=0;i<12;i++)TM_rotmat[i]=FM_align_tot[kk].rotmat[i];
+			TM_CUR=FM_align_tot[kk].main_sco;
+			Alimeng_Add(FM_align_tot_,moln2,TM_CUR);
+		}
+		//add
+		FM_align_tot.clear();
+		for(int kk=0;kk<(int)FM_align_tot_.size();kk++)
+		{
+			FM_align_tot.push_back(FM_align_tot_[kk]);
+		}
+	}
+
+	//return
 	return TM_BEST;
 }
 
