@@ -10,6 +10,7 @@ PDB_Residue::PDB_Residue(void)
 {
 	AA_residue = 'X';
 	PDB_residue_number.assign("A     "); //0: chain_id; 1-4: residue number; 5: insert code
+	hydro_rec.clear();
 }
 PDB_Residue::~PDB_Residue(void)
 {
@@ -20,6 +21,7 @@ PDB_Residue::PDB_Residue(const PDB_Residue & pdb)
 	this->PDB_residue_number.assign(pdb.PDB_residue_number);
 	this->backbone=pdb.backbone;
 	this->sidechain=pdb.sidechain;
+	this->hydro_rec=pdb.hydro_rec;
 }
 PDB_Residue & PDB_Residue::operator =(const PDB_Residue & pdb)
 {
@@ -28,6 +30,7 @@ PDB_Residue & PDB_Residue::operator =(const PDB_Residue & pdb)
 	this->PDB_residue_number.assign(pdb.PDB_residue_number);
 	this->backbone=pdb.backbone;
 	this->sidechain=pdb.sidechain;
+	this->hydro_rec=pdb.hydro_rec;
 	return *this;
 }
 
@@ -39,7 +42,7 @@ int PDB_Residue::PDB_residue_backbone_initialize(char c)
 	if(num==-1)return -1;
 	if(num==20)AA_residue='X';
 	else AA_residue=c;
-	backbone.backbone_sidechain_initialize(4);	
+	backbone.backbone_sidechain_initialize(4);
 	return 0;
 }
 int PDB_Residue::PDB_residue_sidechain_initialize(char c)

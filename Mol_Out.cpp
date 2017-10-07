@@ -199,7 +199,7 @@ int Mol_Out::Output_PDB_II(FILE *fp,int len,XYZ **mol,char *AMI,char *ind,char C
 //OutMode [-2:CA+CB,-1:CA,0:NCaC+CB,+1:ALL]
 //OutGlys [0: GLY 'CB'='CA'][1: normal GLY]
 int Mol_Out::Output_PDB_III(FILE *fp,int len,PDB_Residue *mol,char Chain_ID,
-							int OutType,int OutMode,int OutGlys,int OutLast) //output full-atom PDB file
+	int OutType,int OutMode,int OutGlys,int OutLast) //output full-atom PDB file
 {
 	int i,k;
 	string TER="TER                                                                             ";
@@ -368,7 +368,7 @@ termi:
 	return 1;
 }
 int Mol_Out::Output_PDB_III(FILE *fp,int len,vector <PDB_Residue> &mol,char Chain_ID,
-							int OutType,int OutMode,int OutGlys,int OutLast) //output full-atom PDB file
+	int OutType,int OutMode,int OutGlys,int OutLast) //output full-atom PDB file
 {
 	int i,k;
 	string TER="TER                                                                             ";

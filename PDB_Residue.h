@@ -1,6 +1,7 @@
 #pragma once
 #include "Backbone_Sidechain.h"
 #include <string>
+#include <vector>
 using namespace std;
 
  //====class_PDB_Residue====// 
@@ -14,10 +15,13 @@ public:
 
 //======== variables ========//
 private:
-	char AA_residue;	             //aminoacid type 'A->Z'
-	string PDB_residue_number;	   //number in PDB_Residue, exactly 6 chars
+	char AA_residue;               //aminoacid type 'A->Z'
+	string PDB_residue_number;     //number in PDB_Residue, exactly 6 chars
 	Backbone_Sidechain backbone;   //backbone (N,CA,C,O)
 	Backbone_Sidechain sidechain;  //sidechain (maximal sidechain is 10 for W)
+
+public:
+	vector <XYZ> hydro_rec;        //hydrogen record
 
 //======== functions ========//
 public:

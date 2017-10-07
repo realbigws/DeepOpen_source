@@ -17,6 +17,7 @@ PDB_File::PDB_File(void)
 	OUTP_MODE=1; // [0: sequential][1: PDB numbering]
 	PROC_MODE=1; // [-2:CA+CB,-1:CA,0:Back+CB,+1:ALL]
 	GLYC_MODE=1; // [0: GLY 'CB'='CA'][1: normal GLY]
+	HYDR_MODE=0; // [1: output hydrogen][0: don't out]  //__171007__//
 	//output
 	PDB_OUTPUT=0; // [0: don't output PDB][1: output ]
 	XYZ_OUTPUT=0; // [0: don't output XYZ][1: output ]
@@ -82,7 +83,8 @@ PDB_File &  PDB_File::operator =(const PDB_File & file)
 
 //============================================= Input&Output_Part ========================================//
 // after PDB->XYZ
-int PDB_File::Input_XYZ_MINI_II(int PS,int mode,int st,char stt,int ed,char edd,char chain,int &totnu,XYZ *mol,char *AMI,char *CLE,char *ind,PDB_Residue *pdb)
+int PDB_File::Input_XYZ_MINI_II(int PS,int mode,int st,char stt,int ed,char edd,char chain,
+	int &totnu,XYZ *mol,char *AMI,char *CLE,char *ind,PDB_Residue *pdb)
 {
 	int i,ws_i;
 	int chain_rec;
@@ -281,8 +283,10 @@ int PDB_File::PDB_read_pdb_file(const string & fn,vector<PDB_Chain> & chains,cha
 //OutType [0: sequential][1: PDB numbering]
 //OutMode [-2:CA+CB,-1:CA,0:NCaC+CB,+1:ALL]
 //OutGlys [0: GLY 'CB'='CA'][1: normal GLY]
+//OutHydr [1: output hydrogen][0: don't out]
 //[OS mode]
-void PDB_File::PDB_write_pdb_file_single(ostream &os,PDB_Chain &chain,int OutType,int OutMode,int OutGlys)
+void PDB_File::PDB_write_pdb_file_single(ostream &os,PDB_Chain &chain,
+	int OutType,int OutMode,int OutGlys,int OutHydr)
 {
 	char fp[100];
 	int j,k;
@@ -403,9 +407,55 @@ void PDB_File::PDB_write_pdb_file_single(ostream &os,PDB_Chain &chain,int OutTyp
 			}
 			os<<fp;
 		}
+		//OutHydr
+		if(OutHydr==1)
+		{
+			vector <XYZ> hydro_out=PDB.hydro_rec;
+			int hydr_num=(int)hydro_out.size()<999?(int)hydro_out.size():999;
+			for(k=0;k<hydr_num;k++)
+			{
+				//get hydrogen name
+				char hname[5];
+				sprintf(hname,"H%-3d",k+1);
+				hname[4]='\0';
+				string hname_str=hname;
+				//get coordinate
+				xyz=hydro_out[k];
+				x=xyz.X;
+				y=xyz.Y;
+				z=xyz.Z;
+				//get others
+				numb=0;
+				rfactor=1;
+				temperature=20;
+				//output
+				if(OutType==1) // PDB numbering
+				{
+					sprintf(fp,"ATOM  %5d %4s %3s %6s   %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+						numb,hname_str.c_str(),dummyaa,pdbind.c_str(),x,y,z,rfactor,temperature,buf.c_str());
+				}
+				else           // sequential numbering
+				{
+					if(OutType==0)  // partial sequential (atomic number sequential)
+					{
+						sprintf(fp,"ATOM  %5d %4s %3s %6s   %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+							outtype_atom,hname_str.c_str(),dummyaa,pdbind.c_str(),x,y,z,rfactor,temperature,buf.c_str());
+						outtype_atom++;
+					}
+					else            // total sequential (atomic + residue sequential)
+					{
+						sprintf(fp,"ATOM  %5d %4s %3s %c%4d    %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+							outtype_atom,hname_str.c_str(),dummyaa,Real_Chain,j+1,x,y,z,rfactor,temperature,buf.c_str());
+						outtype_atom++;
+					}
+				}
+				os<<fp;
+			}
+		}//end of 'if(OutHydr==1)'
 	}
 }
-int PDB_File::PDB_write_pdb_file(ostream &os,vector<PDB_Chain> &chains,char chain_id,int OutType,int OutMode,int OutGlys)
+int PDB_File::PDB_write_pdb_file(ostream &os,vector<PDB_Chain> &chains,char chain_id,
+	int OutType,int OutMode,int OutGlys,int OutHydr)
 {
 	char fp[100]; //PDB won't exceed 100
 	int i;
@@ -423,7 +473,7 @@ int PDB_File::PDB_write_pdb_file(ostream &os,vector<PDB_Chain> &chains,char chai
 		else continue;
 begin:
 		chain=chains.at(i);
-		PDB_write_pdb_file_single(os,chain,OutType,OutMode,OutGlys);
+		PDB_write_pdb_file_single(os,chain,OutType,OutMode,OutGlys,OutHydr);
 		sprintf(fp, "%s\n",TER.c_str());
 		os<<fp;
 		if(chain_id!='!'&&chain_id!=-1)break;
@@ -431,7 +481,8 @@ begin:
 	return 0;
 }
 //[FP mode]
-void PDB_File::PDB_write_pdb_file_single(FILE *fp,PDB_Chain &chain,int OutType,int OutMode,int OutGlys)
+void PDB_File::PDB_write_pdb_file_single(FILE *fp,PDB_Chain &chain,
+	int OutType,int OutMode,int OutGlys,int OutHydr)
 {
 	int j,k;
 	int length;
@@ -549,9 +600,54 @@ void PDB_File::PDB_write_pdb_file_single(FILE *fp,PDB_Chain &chain,int OutType,i
 				}
 			}
 		}
+		//OutHydr
+		if(OutHydr==1)
+		{
+			vector <XYZ> hydro_out=PDB.hydro_rec;
+			int hydr_num=(int)hydro_out.size()<999?(int)hydro_out.size():999;
+			for(k=0;k<hydr_num;k++)
+			{
+				//get hydrogen name
+				char hname[5];
+				sprintf(hname,"H%-3d",k+1);
+				hname[4]='\0';
+				string hname_str=hname;
+				//get coordinate
+				xyz=hydro_out[k];
+				x=xyz.X;
+				y=xyz.Y;
+				z=xyz.Z;
+				//get others
+				numb=0;
+				rfactor=1;
+				temperature=20;
+				//output
+				if(OutType==1) // PDB numbering
+				{
+					fprintf(fp,"ATOM  %5d %4s %3s %6s   %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+						numb,hname_str.c_str(),dummyaa,pdbind.c_str(),x,y,z,rfactor,temperature,buf.c_str());
+				}
+				else           // sequential numbering
+				{
+					if(OutType==0)  // partial sequential (atomic number sequential)
+					{
+						fprintf(fp,"ATOM  %5d %4s %3s %6s   %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+							outtype_atom,hname_str.c_str(),dummyaa,pdbind.c_str(),x,y,z,rfactor,temperature,buf.c_str());
+						outtype_atom++;
+					}
+					else            // total sequential (atomic + residue sequential)
+					{
+						fprintf(fp,"ATOM  %5d %4s %3s %c%4d    %8.3f%8.3f%8.3f%6.2f%6.2f%s\n",
+							outtype_atom,hname_str.c_str(),dummyaa,Real_Chain,j+1,x,y,z,rfactor,temperature,buf.c_str());
+						outtype_atom++;
+					}
+				}
+			}
+		}//end of 'if(OutHydr==1)'
 	}
 }
-int PDB_File::PDB_write_pdb_file(FILE *fp,vector<PDB_Chain> &chains,char chain_id,int OutType,int OutMode,int OutGlys)
+int PDB_File::PDB_write_pdb_file(FILE *fp,vector<PDB_Chain> &chains,
+		char chain_id,int OutType,int OutMode,int OutGlys,int OutHydr)
 {
 	int i;
 	int totchain;
@@ -568,7 +664,7 @@ int PDB_File::PDB_write_pdb_file(FILE *fp,vector<PDB_Chain> &chains,char chain_i
 		else continue;
 begin:
 		chain=chains.at(i);
-		PDB_write_pdb_file_single(fp,chain,OutType,OutMode,OutGlys);
+		PDB_write_pdb_file_single(fp,chain,OutType,OutMode,OutGlys,OutHydr);
 		fprintf(fp, "%s\n",TER.c_str());
 		if(chain_id!='!'&&chain_id!=-1)break;
 	}
@@ -577,13 +673,13 @@ begin:
 //==================== normal PDB and XYZ output ==================//
 // Output PDB File
 void PDB_File::PDB_write_pdb_chain(FILE *fp,char *pdbid,char chain,int head,int totnum,
-		vector <PDB_Residue> &PDB_output,int OutType,int OutMode,int OutGlys)
+		vector <PDB_Residue> &PDB_output,int OutType,int OutMode,int OutGlys,int OutHydr)
 {
 	int k;
 	PDB_Chain pdb_chain;
 	pdb_chain.initialize_simple(totnum,chain);
 	for(k=0;k<totnum;k++)pdb_chain.set_residue(k,PDB_output.at(head+k));
-	PDB_write_pdb_file_single(fp,pdb_chain,OutType,OutMode,OutGlys);
+	PDB_write_pdb_file_single(fp,pdb_chain,OutType,OutMode,OutGlys,OutHydr);
 }
 // Output XYZ File
 void PDB_File::PDB_write_xyz_chain(FILE *fp,char *pdbid,char chain,int head,int totnum,
@@ -702,12 +798,13 @@ int PDB_File::PreProcess_Record_Alt(vector <string> &PDB_record_all)
 	PDB_record_all.resize(count);
 	return count;
 }
-int PDB_File::PreProcess_Record_Hydro(vector <string> &PDB_record_all)
+int PDB_File::PreProcess_Record_Hydro(vector <string> &PDB_record_all, vector <string> &hydro_rec)
 {
 	int i;
 	int record_count=(int)PDB_record_all.size();
 	char h1,h2,hh,ht;
 	int count=0;
+	hydro_rec.clear();
 	for(i=0;i<record_count;i++)
 	{
 		h1=PDB_record_all[i][12];
@@ -720,6 +817,10 @@ int PDB_File::PreProcess_Record_Hydro(vector <string> &PDB_record_all)
 			PDB_record_all[count]=PDB_record_all[i];
 			count++;
 		}
+		else
+		{
+			hydro_rec.push_back(PDB_record_all[i]);
+		}		
 	}
 	PDB_record_all.resize(count);
 	return count;
@@ -779,7 +880,8 @@ int PDB_File::PDB_Process_Record(vector <string> &PDB_record_all,char ori_c,PDB_
 	//pre_process
 	record_count=PreProcess_Record_Anis(PDB_record_all);        //kill "ANIS"
 	record_count=PreProcess_Record_Alt(PDB_record_all);         //kill alt
-	record_count=PreProcess_Record_Hydro(PDB_record_all);       //kill hydrogen
+	vector <string> hydro_rec;
+	record_count=PreProcess_Record_Hydro(PDB_record_all,hydro_rec); //kill hydrogen
 	record_count=PreProcess_Record_Check(PDB_record_all,ori_c); //kill different residue (different to ori_c)
 	if(record_count<0)
 	{
@@ -788,6 +890,44 @@ int PDB_File::PDB_Process_Record(vector <string> &PDB_record_all,char ori_c,PDB_
 	}
 	if(ori_c=='X')if(PRTOUT==1)fprintf(stderr,"WARNING!! -> RES_ABNORMAL!!\r");
 	amino=ori_c;
+
+	//---- process hydrogen -----//__2017_10_07__//
+	if(HYDR_MODE==1)
+	{
+		vector <XYZ> hydro_out;
+		for(i=0;i<(int)hydro_rec.size();i++)
+		{
+			tempbuf=hydro_rec[i];
+			//========================= Get XYZ coordinate ===========================//
+			for(k=0;k<8;k++)posx[k]=tempbuf[30+k];
+			posx[k]='\0';    // get PDB_FILE x coordinate (8)
+			for(k=0;k<8;k++)posy[k]=tempbuf[38+k];
+			posy[k]='\0';    // get PDB_FILE y coordinate (8)
+			for(k=0;k<8;k++)posz[k]=tempbuf[46+k];
+			posz[k]='\0';    // get PDB_FILE z coordinate (8)
+			//__080228__//apply WS_Neo_Method , check the coordinate
+			if(str2dou(posx,posxf)!=1)
+			{
+				if(PRTOUT==1)fprintf(stderr,"ERROR => HYDROGEN BAD X_POS AT [%d]\n",i);
+				return 0; //coordinate error
+			}
+			if(str2dou(posy,posyf)!=1)
+			{
+				if(PRTOUT==1)fprintf(stderr,"ERROR => HYDROGEN BAD Y_POS AT [%d]\n",i);
+				return 0; //coordinate error
+			}
+			if(str2dou(posz,poszf)!=1)
+			{
+				if(PRTOUT==1)fprintf(stderr,"ERROR => HYDROGEN BAD Z_POS AT [%d]\n",i);
+				return 0; //coordinate error
+			}
+			//----> push_back
+			XYZ xyz(posxf, posyf, poszf);
+			hydro_out.push_back(xyz);
+		}
+		output.hydro_rec=hydro_out;
+	}
+
 	//init
 	output.PDB_residue_backbone_initialize(amino); 
 	count=AA26_sidechain_size(amino-'A'); 
@@ -888,7 +1028,7 @@ int PDB_File::PDB_Process_Record(vector <string> &PDB_record_all,char ori_c,PDB_
 				}
 				else
 				{
-   					XYZ xyz(posxf, posyf, poszf);
+					XYZ xyz(posxf, posyf, poszf);
 					output.set_backbone_atom(back_ret,xyz,atom_serial_number, rfactor, temperature);
 				}
 			}
@@ -1415,9 +1555,9 @@ wsdeadendback:
 			} 
 
 
-            //__080306__// 
-            if(ResSeqI!=seq_record || iCodeC!=ws_ins_bak) 
-            { 
+			//__080306__// 
+			if(ResSeqI!=seq_record || iCodeC!=ws_ins_bak) 
+			{ 
 wsdeadend: 
 				if(Has_CA==0 && CaONLY==0) 
 				{ 
@@ -1498,18 +1638,18 @@ wsdangerback:
 					should_record=1; 
 				} 
 wsfornext: 
-                Has_CA=0; 
-                CA_count=0; 
-                cax=cay=caz=0.0; 
-                Has_Done=0; // default NOT done 
-
-                //record_last//__080322__// 
-                code_last=ws_ins_bak; 
-                res_last=seq_record; 
-
-                //record the ResSeq & iCode 
-                ws_ins_bak=iCodeC; 
-                seq_record=ResSeqI; 
+				Has_CA=0; 
+				CA_count=0; 
+				cax=cay=caz=0.0; 
+				Has_Done=0; // default NOT done 
+				
+				//record_last//__080322__// 
+				code_last=ws_ins_bak; 
+				res_last=seq_record; 
+				
+				//record the ResSeq & iCode 
+				ws_ins_bak=iCodeC; 
+				seq_record=ResSeqI; 
 
 				//first_record//__090517__// 
 				if(CbBACK==1) 
@@ -1557,280 +1697,280 @@ wsfornext:
 			temp.assign(AtomName);
 			debug_info(1, "temp:%s\n", temp.c_str());
 
-			//==================== process CA ====================//
-			if(temp==(" CA ")) 
-			{
-				Has_CA=1;  // Has CA_ATOM 
-				ResError = 1; // init ResError [default correct] 
-				BrkError = 1; // init BrkError [default correct] 
+		//==================== process CA ====================//
+		if(temp==(" CA ")) 
+		{
+			Has_CA=1;  // Has CA_ATOM 
+			ResError = 1; // init ResError [default correct] 
+			BrkError = 1; // init BrkError [default correct] 
 
+			for(ws_i=0;ws_i<3;ws_i++)ResName[ws_i]=tempbuf[17+ws_i]; 
+			ResName[ws_i]='\0';    // get PDB_FILE 5th column (3) 
+			ChianID_C=tempbuf[21]; // get PDB_FILE 6th column (1) 
+
+wsdanger: 
+			//===First_Res===// 
+			if(FirstRes==1) 
+			{ 
+				//__NEO_OUTPUT__//__080226__// 
+				if(LOGOUT==1)
+				{
+					string wlog="";
+					wlog=wlog + pdbid + ChianID;  
+					fprintf(flog,"[%5s]=>",wlog.c_str()); 
+				}
+
+				//__080305__// 
+				rescount=ResSeqI; 
+				if(iCodeC!=' ') 
+				{ 
+					ws_ins_totnum++; 
+					//__NEO_OUTPUT__//__080226__// 
+					if(LOGOUT==1)fprintf(flog,"[%c_%4d]",iCodeC,ResSeqI); 
+				} 
+			} 
+			else 
+			{ 
+				//__080304__//=> Alt_Error [Error_2] 
+				if(Has_Done==1 && (ResSeqI == seq_record && iCodeC==ws_ins_bak)) 
+				{ 
+					//__061101__// => Chain error  [Error_5] 
+					if(ChianID_C != ChianID)goto wsexit; 
+
+					rescount = ResSeqI; 
+					//__NEO_OUTPUT__//__080226__// 
+					if(LOGOUT==1)fprintf(flog,"[A|%4d]",ResSeqI);    
+                    
+					if(ws_danger==1)goto wsdangerback; //__080306__//                                
+					goto ws_altins; 
+				} 
+
+				//__071224__//=> Ins_Error [Error_3] 
+				if(iCodeC!=' ') 
+				{ 
+					//test//__080307__// 
+					ws_ins_totnum++; 
+
+					if(iCodeC==code_last) 
+					{ 
+						if(ResSeqI != rescount)ResError = 0;  //ResError 
+					} 
+					else 
+					{
+						if(ResSeqI != rescount-1)ResError = 0;  //ResError 
+						else 
+						{ 
+							if(code_last==' ') 
+							{ 
+								if(iCodeC!='A')ResError = 0; 
+							} 
+							else 
+							{ 
+								if(abs(iCodeC-code_last)!=1)ResError = 0;
+							}
+						} 
+					} 
+					rescount = ResSeqI; 
+					//__NEO_OUTPUT__//__080226__// 
+					if(LOGOUT==1)fprintf(flog,"[%c_%4d]",iCodeC,ResSeqI);
+				}
+				// __061106__// =>rescount error [Error_4] 
+				else if(ResSeqI != rescount) 
+				{
+					if(ResSeqI != rescount-1) 
+					{
+						ResError = 0;    //ResError 
+						//__NEO_OUTPUT__//__080226__// 
+						if(LOGOUT==1)fprintf(flog,"[M|%4d]",ResSeqI);
+					}
+					rescount = ResSeqI; 
+				}
+			}
+
+
+			//__070811__//=> ResChar_Wrong [Error_1] 
+			ResName_ori.assign(ResName);
+			//MODRES MAP
+			ResName_mod=ResName_ori;
+			if(MODRES==1)MODRES_Map(ResName_ori,ResName_mod,PDB_MODRES_Map);
+			//MODRES MAP over
+			ResChar = Three2One_III(ResName_mod.c_str()); 
+			if(ResChar == 'X')             // WARNING =>ResChar error 
+			{ 
+				//__070811__// 
+				if(temptag==("HETA"))
+				{
+					if(LOGOUT==1)fprintf(flog,"[H|%4d]",ResSeqI);
+				}
+				else
+				{
+					if(LOGOUT==1)fprintf(flog,"[W|%4d]",ResSeqI);
+				}
+			} 
+
+
+			//__061101__// => Chain error  [Error_5] 
+			if(ChianID_C != ChianID)goto wsexit; 
+
+
+			//========================= tail check ===========================//                     
+			if(FirstRes==1)FirstRes=0; 
+			if(ws_danger==1) goto wsdangerback; 
+
+
+
+			//========================= Get XYZ coordinate ===========================// 
+			for(ws_i=0;ws_i<8;ws_i++)posx[ws_i]=tempbuf[30+ws_i]; 
+			posx[ws_i]='\0';    // get PDB_FILE x coordinate (8) 
+			for(ws_i=0;ws_i<8;ws_i++)posy[ws_i]=tempbuf[38+ws_i]; 
+			posy[ws_i]='\0';    // get PDB_FILE y coordinate (8) 
+			for(ws_i=0;ws_i<8;ws_i++)posz[ws_i]=tempbuf[46+ws_i]; 
+			posz[ws_i]='\0';    // get PDB_FILE z coordinate (8) 
+
+
+			//__080228__//apply WS_Neo_Method , check the coordinate 
+			if(str2dou(posx,posxf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD X_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+			if(str2dou(posy,posyf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Y_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+			if(str2dou(posz,poszf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Z_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+
+			//========================= check whether break ===========================// 
+			distance = sqrt( (posxf-posxt)*(posxf-posxt) + (posyf-posyt)*(posyf-posyt) + (poszf-poszt)*(poszf-poszt)); 
+			if( ( distance < 2.5 || distance > 4.5) &&  FirstTime == 0) 
+			{ 
+				BrkError = 0;  //BrkError 
+				//__NEO_OUTPUT__//__080226__// 
+				if(LOGOUT==1)fprintf(flog,"[D|%4.1f]",distance); 
+			}                                        
+			posxt =posxf; 
+			posyt =posyf; 
+			poszt =poszf; 
+			if(FirstTime == 1) FirstTime = 0;   
+
+              
+			//========================= write into XYZ & AMI files ===========================//     
+			//__write to STC__// 
+			{ 
+				XYZ xyz(posxf,posyf,poszf);
+				PDB_r_point.push_back(xyz);                                     
+			} 
+			//__write to STC__//over 
+
+			//__write to char__//
+			{
+				if(ResError==0 && BrkError==0)wstag='+';   //Double Error [BrkEr+ResEr] 
+				else 
+				{ 
+					if(ResError==0)wstag='|';              //[ResError] 
+					else if(BrkError==0)wstag='-';         //[BrkError] 
+					else wstag=' ';                        // Normal 
+				}
+				PDB_int_rec.push_back(ResSeqI);
+				PDB_ins_rec.push_back(iCodeC);
+				PDB_tag_rec.push_back(wstag);
+				PDB_chn_rec.push_back(ChianID);
+				PDB_ami_rec.push_back(ResChar);
+				PDB_cle_rec.push_back(' ');
+			}
+			//__write to char__//over
+
+			//count++//
+			PDB_num_rec++; 
+			wscount++; 
+
+			//__080308__// 
+			Has_Done=1; 
+
+			//first_record//__090517__// 
+			should_record=1; 
+ws_altins:                               
+			rescount++; 
+		}// EMD OF IF(temp==(" CA ")) 
+		else if(Has_CA==0 && CaONLY==0) 
+		{ 
+			if(CA_count==0) 
+			{ 
 				for(ws_i=0;ws_i<3;ws_i++)ResName[ws_i]=tempbuf[17+ws_i]; 
 				ResName[ws_i]='\0';    // get PDB_FILE 5th column (3) 
 				ChianID_C=tempbuf[21]; // get PDB_FILE 6th column (1) 
+				iCodeC=tempbuf[26];    // get PDB_FILE 8th column (1) 
+			} 
 
-wsdanger: 
-				//===First_Res===// 
-				if(FirstRes==1) 
+			//ws_DNA_test// 
+			ws_DNA_test=0; 
+			for(ws_i=0;ws_i<3;ws_i++)if(ResName[ws_i]==' ')ws_DNA_test++; 
+			if(ws_DNA_test!=0) 
+			{ 
+				if(ChianID==' '&&FirstRes==0) 
 				{ 
-					//__NEO_OUTPUT__//__080226__// 
-					if(LOGOUT==1)
-					{
-						string wlog="";
-						wlog=wlog + pdbid + ChianID;  
-						fprintf(flog,"[%5s]=>",wlog.c_str()); 
-					}
-
-					//__080305__// 
-					rescount=ResSeqI; 
-					if(iCodeC!=' ') 
-					{ 
-						ws_ins_totnum++; 
-						//__NEO_OUTPUT__//__080226__// 
-						if(LOGOUT==1)fprintf(flog,"[%c_%4d]",iCodeC,ResSeqI); 
-					} 
-				} 
-				else 
-				{ 
-					//__080304__//=> Alt_Error [Error_2] 
-					if(Has_Done==1 && (ResSeqI == seq_record && iCodeC==ws_ins_bak)) 
-					{ 
-						//__061101__// => Chain error  [Error_5] 
-						if(ChianID_C != ChianID)goto wsexit; 
-
-						rescount = ResSeqI; 
-						//__NEO_OUTPUT__//__080226__// 
-						if(LOGOUT==1)fprintf(flog,"[A|%4d]",ResSeqI);    
-	                    
-						if(ws_danger==1)goto wsdangerback; //__080306__//                                
-						goto ws_altins; 
-					} 
-
-					//__071224__//=> Ins_Error [Error_3] 
-					if(iCodeC!=' ') 
-					{ 
-						//test//__080307__// 
-						ws_ins_totnum++; 
-
-						if(iCodeC==code_last) 
-						{ 
-							if(ResSeqI != rescount)ResError = 0;  //ResError 
-						} 
-						else 
-						{
-							if(ResSeqI != rescount-1)ResError = 0;  //ResError 
-							else 
-							{ 
-								if(code_last==' ') 
-								{ 
-									if(iCodeC!='A')ResError = 0; 
-								} 
-								else 
-								{ 
-									if(abs(iCodeC-code_last)!=1)ResError = 0;
-								}
-							} 
-						} 
-						rescount = ResSeqI; 
-						//__NEO_OUTPUT__//__080226__// 
-						if(LOGOUT==1)fprintf(flog,"[%c_%4d]",iCodeC,ResSeqI);
-					}
-					// __061106__// =>rescount error [Error_4] 
-					else if(ResSeqI != rescount) 
-					{
-						if(ResSeqI != rescount-1) 
-						{
-							ResError = 0;    //ResError 
-							//__NEO_OUTPUT__//__080226__// 
-							if(LOGOUT==1)fprintf(flog,"[M|%4d]",ResSeqI);
-						}
-						rescount = ResSeqI; 
-					}
-				}
-
-
-				//__070811__//=> ResChar_Wrong [Error_1] 
-				ResName_ori.assign(ResName);
-				//MODRES MAP
-				ResName_mod=ResName_ori;
-				if(MODRES==1)MODRES_Map(ResName_ori,ResName_mod,PDB_MODRES_Map);
-				//MODRES MAP over
-				ResChar = Three2One_III(ResName_mod.c_str()); 
-				if(ResChar == 'X')             // WARNING =>ResChar error 
-				{ 
-					//__070811__// 
-					if(temptag==("HETA"))
-					{
-						if(LOGOUT==1)fprintf(flog,"[H|%4d]",ResSeqI);
-					}
-					else
-					{
-						if(LOGOUT==1)fprintf(flog,"[W|%4d]",ResSeqI);
-					}
-				} 
-
-
-				//__061101__// => Chain error  [Error_5] 
-				if(ChianID_C != ChianID)goto wsexit; 
-
-
-				//========================= tail check ===========================//                     
-				if(FirstRes==1)FirstRes=0; 
-				if(ws_danger==1) goto wsdangerback; 
-
-
-
-				//========================= Get XYZ coordinate ===========================// 
-				for(ws_i=0;ws_i<8;ws_i++)posx[ws_i]=tempbuf[30+ws_i]; 
-				posx[ws_i]='\0';    // get PDB_FILE x coordinate (8) 
-				for(ws_i=0;ws_i<8;ws_i++)posy[ws_i]=tempbuf[38+ws_i]; 
-				posy[ws_i]='\0';    // get PDB_FILE y coordinate (8) 
-				for(ws_i=0;ws_i<8;ws_i++)posz[ws_i]=tempbuf[46+ws_i]; 
-				posz[ws_i]='\0';    // get PDB_FILE z coordinate (8) 
-
-
-				//__080228__//apply WS_Neo_Method , check the coordinate 
-				if(str2dou(posx,posxf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD X_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-				if(str2dou(posy,posyf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Y_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-				if(str2dou(posz,poszf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Z_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-
-				//========================= check whether break ===========================// 
-				distance = sqrt( (posxf-posxt)*(posxf-posxt) + (posyf-posyt)*(posyf-posyt) + (poszf-poszt)*(poszf-poszt)); 
-				if( ( distance < 2.5 || distance > 4.5) &&  FirstTime == 0) 
-				{ 
-					BrkError = 0;  //BrkError 
-					//__NEO_OUTPUT__//__080226__// 
-					if(LOGOUT==1)fprintf(flog,"[D|%4.1f]",distance); 
-				}                                        
-				posxt =posxf; 
-				posyt =posyf; 
-				poszt =poszf; 
-				if(FirstTime == 1) FirstTime = 0;   
-
-                
-				//========================= write into XYZ & AMI files ===========================//     
-				//__write to STC__// 
-				{ 
-					XYZ xyz(posxf,posyf,poszf);
-					PDB_r_point.push_back(xyz);                                     
-				} 
-				//__write to STC__//over 
-
-				//__write to char__//
-				{
-					if(ResError==0 && BrkError==0)wstag='+';   //Double Error [BrkEr+ResEr] 
-					else 
-					{ 
-						if(ResError==0)wstag='|';              //[ResError] 
-						else if(BrkError==0)wstag='-';         //[BrkError] 
-						else wstag=' ';                        // Normal 
-					}
-					PDB_int_rec.push_back(ResSeqI);
-					PDB_ins_rec.push_back(iCodeC);
-					PDB_tag_rec.push_back(wstag);
-					PDB_chn_rec.push_back(ChianID);
-					PDB_ami_rec.push_back(ResChar);
-					PDB_cle_rec.push_back(' ');
-				}
-				//__write to char__//over
-
-				//count++//
-				PDB_num_rec++; 
-				wscount++; 
-
-				//__080308__// 
-				Has_Done=1; 
-
-				//first_record//__090517__// 
-				should_record=1; 
-ws_altins:                               
-				rescount++; 
-            }// EMD OF IF(temp==(" CA ")) 
-            else if(Has_CA==0 && CaONLY==0) 
-            { 
-				if(CA_count==0) 
-				{ 
-					for(ws_i=0;ws_i<3;ws_i++)ResName[ws_i]=tempbuf[17+ws_i]; 
-					ResName[ws_i]='\0';    // get PDB_FILE 5th column (3) 
-					ChianID_C=tempbuf[21]; // get PDB_FILE 6th column (1) 
-					iCodeC=tempbuf[26];    // get PDB_FILE 8th column (1) 
-				} 
-
-				//ws_DNA_test// 
-				ws_DNA_test=0; 
-				for(ws_i=0;ws_i<3;ws_i++)if(ResName[ws_i]==' ')ws_DNA_test++; 
-				if(ws_DNA_test!=0) 
-				{ 
-					if(ChianID==' '&&FirstRes==0) 
-					{ 
-						wsout=1; 
-						goto wsexit; 
-					} 
-
-					FirstRes=1; 
-					ws_dead_chain=ChianID; 
+					wsout=1; 
 					goto wsexit; 
 				} 
-				//water_test// 
-				temp.assign(ResName);
-				if(temp==("HOH")) 
-				{ 
-					if(ChianID==' '&&FirstRes==0) 
-					{ 
-						wsout=1; 
-						goto wsexit; 
-					} 
 
-					FirstRes=1; 
-					ws_dead_chain=ChianID; 
+				FirstRes=1; 
+				ws_dead_chain=ChianID; 
+				goto wsexit; 
+			} 
+			//water_test// 
+			temp.assign(ResName);
+			if(temp==("HOH")) 
+			{ 
+				if(ChianID==' '&&FirstRes==0) 
+				{ 
+					wsout=1; 
 					goto wsexit; 
 				} 
-				//over// 
 
-				//to dealing with non-CA residue, collect 99 atoms for average coordinate is enough //__110230__//
-				if(CA_count>=99)goto wsDNAtest; 
-				CA_count++; 
+				FirstRes=1; 
+				ws_dead_chain=ChianID; 
+				goto wsexit; 
+			} 
+			//over// 
 
-				//========================= Get XYZ coordinate ===========================// 
-				for(ws_i=0;ws_i<8;ws_i++)posx[ws_i]=tempbuf[30+ws_i]; 
-				posx[ws_i]='\0';    // get PDB_FILE x coordinate (8) 
-				for(ws_i=0;ws_i<8;ws_i++)posy[ws_i]=tempbuf[38+ws_i]; 
-				posy[ws_i]='\0';    // get PDB_FILE y coordinate (8) 
-				for(ws_i=0;ws_i<8;ws_i++)posz[ws_i]=tempbuf[46+ws_i]; 
-				posz[ws_i]='\0';    // get PDB_FILE z coordinate (8) 
+			//to dealing with non-CA residue, collect 99 atoms for average coordinate is enough //__110230__//
+			if(CA_count>=99)goto wsDNAtest; 
+			CA_count++; 
+
+			//========================= Get XYZ coordinate ===========================// 
+			for(ws_i=0;ws_i<8;ws_i++)posx[ws_i]=tempbuf[30+ws_i]; 
+			posx[ws_i]='\0';    // get PDB_FILE x coordinate (8) 
+			for(ws_i=0;ws_i<8;ws_i++)posy[ws_i]=tempbuf[38+ws_i]; 
+			posy[ws_i]='\0';    // get PDB_FILE y coordinate (8) 
+			for(ws_i=0;ws_i<8;ws_i++)posz[ws_i]=tempbuf[46+ws_i]; 
+			posz[ws_i]='\0';    // get PDB_FILE z coordinate (8) 
 
 
-				//__080228__//apply WS_Neo_Method , check the coordinate 
-				if(str2dou(posx,posxf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD X_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-				if(str2dou(posy,posyf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Y_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-				if(str2dou(posz,poszf)!=1) 
-				{ 
-					if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Z_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
-					return STR_TRANS_ERROR; //coordinate error 
-				} 
-				cax+=posxf; 
-				cay+=posyf; 
-				caz+=poszf; 
-            } 
+			//__080228__//apply WS_Neo_Method , check the coordinate 
+			if(str2dou(posx,posxf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD X_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+			if(str2dou(posy,posyf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Y_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+			if(str2dou(posz,poszf)!=1) 
+			{ 
+				if(PRTOUT==1)fprintf(stderr,"ERROR => BAD Z_POS AT PDB_ID[%4s]:CHAIN[%c]:RES_NUM[%4d]!\n",pdbid,ChianID,ResSeqI); 
+				return STR_TRANS_ERROR; //coordinate error 
+			} 
+			cax+=posxf; 
+			cay+=posyf; 
+			caz+=poszf; 
+		} 
 
 wsDNAtest: 
 			//first_record//__090517__// 
@@ -1966,7 +2106,8 @@ wsexit:
 				{
 					if(PDB_OUTPUT==1) //output PDB
 					{
-						PDB_write_pdb_chain(fpdb,pdbid,ChianID,oo_n,wscount,PDB_output,OUTP_MODE,PROC_MODE);
+						PDB_write_pdb_chain(fpdb,pdbid,ChianID,oo_n,wscount,PDB_output,
+							OUTP_MODE,PROC_MODE,GLYC_MODE,HYDR_MODE);
 						fprintf(fpdb,"%s\n",TER.c_str()); 
 					}
 					if(XYZ_OUTPUT==1) //output XYZ
