@@ -291,19 +291,22 @@ int PDB_Chain::print_phi_psi_omega(ostream & os)
 	os<<endl;
 	return 0;
 }
-int PDB_Chain::print_phi_psi_omega(string & out)
+int PDB_Chain::print_phi_psi_omega(vector <string> & out)
 {
-	stringstream os;
+	out.clear();
 	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
 	{
+		//print
+		stringstream os;
 		os<<setw(4)<<i + 1<<" ";
 		os<<setw(10)<<phi_psi_omegas.at(i).phi / M_PI * 180<<" ";
 		os<<setw(10)<<phi_psi_omegas.at(i).psi / M_PI * 180<<" ";
 		os<<setw(10)<<phi_psi_omegas.at(i).omega / M_PI * 180<<" ";
 		os<<endl;
+		//push
+		string buf=os.str();
+		out.push_back(buf);
 	}
-	os<<endl;
-	out=os.str();
 	return 0;
 }
 
@@ -319,18 +322,21 @@ int PDB_Chain::print_theta_tau(ostream & os)
 	os<<endl;
 	return 0;
 }
-int PDB_Chain::print_theta_tau(string & out)
+int PDB_Chain::print_theta_tau(vector <string> & out)
 {
-	stringstream os;
+	out.clear();
 	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
 	{
+		//print
+		stringstream os;
 		os<<setw(4)<<i + 1<<" ";
 		os<<setw(10)<<theta_taus.at(i).theta / M_PI * 180<<" ";
 		os<<setw(10)<<theta_taus.at(i).tau / M_PI * 180<<" ";
 		os<<endl;
+		//push
+		string buf=os.str();
+		out.push_back(buf);
 	}
-	os<<endl;
-	out=os.str();
 	return 0;
 }
 
