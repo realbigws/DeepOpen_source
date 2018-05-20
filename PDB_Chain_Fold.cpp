@@ -264,7 +264,8 @@ int PDB_Chain_Fold::calculate_phi_psi_omega(void)
 			wsbad=1;
 			goto end;
 		}
-		phi_psi_ome.phi = torsion_angle[i * 3 + 2];
+		if(i==0)phi_psi_ome.phi=M_PI;
+		else phi_psi_ome.phi = torsion_angle[i * 3 + 2];
 		phi_psi_ome.psi = torsion_angle[i * 3 + 3];
 		phi_psi_ome.omega = torsion_angle[i * 3 + 4];
 		retv=set_phi_psi_omega(i,phi_psi_ome); //set
@@ -274,6 +275,7 @@ int PDB_Chain_Fold::calculate_phi_psi_omega(void)
 			goto end;
 		}
 	}
+	//-> terminal
 	double phi;
 	if(i==0)phi=M_PI;
 	else phi=torsion_angle[3*n - 1];
@@ -342,8 +344,10 @@ int PDB_Chain_Fold::calculate_theta_tau(void)
 			wsbad=1;
 			goto end;
 		}
-		theta_tau.theta = bond_angle[i];
-		theta_tau.tau = torsion_angle[i];
+		if(i<2)theta_tau.theta = M_PI;
+		else theta_tau.theta = bond_angle[i];
+		if(i<3)theta_tau.tau = M_PI;
+		else theta_tau.tau = torsion_angle[i];
 		retv=set_theta_tau(i,theta_tau);    //set
 		if(retv<0)
 		{
