@@ -4,6 +4,7 @@
 #include "PDB_Utility.h"
 #include <vector>
 #include <string>
+#include <sstream>
 using namespace std;
 
 
@@ -99,7 +100,9 @@ public:
 
 	//--- printf related ---//
 	int print_phi_psi_omega(ostream & os);
+	int print_phi_psi_omega(string &out);
 	int print_theta_tau(ostream & os);
+	int print_theta_tau(string &out);
 	int print_chain(ostream & os);		// output this chain in a PDB format
 };
 //====class_PDB_Chain====//over 

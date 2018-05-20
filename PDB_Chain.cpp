@@ -280,7 +280,6 @@ int PDB_Chain::set_sequence(string & seq)
 //================================= printf related ============================//
 int PDB_Chain::print_phi_psi_omega(ostream & os)
 {
-	os<<endl;
 	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
 	{
 		os<<setw(4)<<i + 1<<" ";
@@ -292,9 +291,24 @@ int PDB_Chain::print_phi_psi_omega(ostream & os)
 	os<<endl;
 	return 0;
 }
+int PDB_Chain::print_phi_psi_omega(string & out)
+{
+	stringstream os;
+	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
+	{
+		os<<setw(4)<<i + 1<<" ";
+		os<<setw(10)<<phi_psi_omegas.at(i).phi / M_PI * 180<<" ";
+		os<<setw(10)<<phi_psi_omegas.at(i).psi / M_PI * 180<<" ";
+		os<<setw(10)<<phi_psi_omegas.at(i).omega / M_PI * 180<<" ";
+		os<<endl;
+	}
+	os<<endl;
+	out=os.str();
+	return 0;
+}
+
 int PDB_Chain::print_theta_tau(ostream & os)
 {
-	os<<endl;
 	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
 	{
 		os<<setw(4)<<i + 1<<" ";
@@ -305,6 +319,21 @@ int PDB_Chain::print_theta_tau(ostream & os)
 	os<<endl;
 	return 0;
 }
+int PDB_Chain::print_theta_tau(string & out)
+{
+	stringstream os;
+	for(int i = 0; i < (int)this->phi_psi_omegas.size(); i++)
+	{
+		os<<setw(4)<<i + 1<<" ";
+		os<<setw(10)<<theta_taus.at(i).theta / M_PI * 180<<" ";
+		os<<setw(10)<<theta_taus.at(i).tau / M_PI * 180<<" ";
+		os<<endl;
+	}
+	os<<endl;
+	out=os.str();
+	return 0;
+}
+
 int PDB_Chain::print_chain(ostream & os)
 {
 	//init
