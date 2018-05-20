@@ -100,9 +100,9 @@ public:
 
 	//--- printf related ---//
 	int print_phi_psi_omega(ostream & os);
-	int print_phi_psi_omega(vector <string> &out);
+	int print_phi_psi_omega(vector <vector <double> > &out);
 	int print_theta_tau(ostream & os);
-	int print_theta_tau(vector <string> &out);
+	int print_theta_tau(vector <vector <double> > &out);
 	int print_chain(ostream & os);		// output this chain in a PDB format
 };
 //====class_PDB_Chain====//over 
