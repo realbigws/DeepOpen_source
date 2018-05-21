@@ -153,7 +153,6 @@ void Hydro_Bond::HB_Calc_Hydro_Bond(vector <vector <double> > &hb_mat)
 			//-> push
 			hb_mat[i][j]=value;
 		}
-	}
 }
 
 
