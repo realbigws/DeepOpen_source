@@ -135,6 +135,28 @@ void Hydro_Bond::HB_Calc_Hydro_Bond(void)
 	HB_Calc_Hydro_Bond(HB_mol,HB_moln,HB_simple);
 }
 
+//---- calculate HydroBond matrix -----//__2018.05.20__//
+void Hydro_Bond::HB_Calc_Hydro_Bond(vector <vector <double> > &hb_mat)
+{
+	int i,j;
+	double value;
+	//create
+	hb_mat.resize(HB_moln);
+	for(i=0;i<HB_moln;i++)hb_mat[i].resize(HB_moln);
+	//calculate
+	for(i=0;i<HB_moln;i++)
+		for(j=0;j<HB_moln;j++)
+		{
+			//-> calc
+			if(j==i||j==i-1)value=0;
+			else value=HB_Calc_Single(HB_mol,i,j);
+			//-> push
+			hb_mat[i][j]=value;
+		}
+	}
+}
+
+
 //------------------------ calc secondary structure ----------------//
 //[check broken chain!]
 int Hydro_Bond::HB_Broke_Check(int i,int j)

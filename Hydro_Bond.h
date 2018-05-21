@@ -38,6 +38,7 @@ public:
 	double HB_Calc_Single(XYZ **HB_mol,int i,int j); //calc_single (from i -> j)
 	void HB_Calc_Hydro_Bond(XYZ **HB_mol,int HB_moln,int *HB_simple);  //calc_main
 	void HB_Calc_Hydro_Bond(void);                   //normal usage
+	void HB_Calc_Hydro_Bond(vector <vector <double> > &hb_mat); //-> output hydro_bond matrix //__180520__//
 	//calc Secondary_Structure
 	//[helix and turn]
 	int HB_Broke_Check(int i,int j);                   //check broke
