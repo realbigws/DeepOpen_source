@@ -14,6 +14,7 @@ public:
 
 //---- parameter ----//
 public:
+	int TM_NOTM;          //[0,1] -> use TMscore to superimpose or not
 	int TM_GAP_TYPE;      //[0,1] -> type
 	int TM_GAP_STAGE;     //[1,2] -> using which stage
 	double TM_GAP_OPEN;   //TM_GAP_OPEN [-0.6]
@@ -62,7 +63,7 @@ public:
 	double TM_Vector_Score_CB(int ii,int jj,double *rotmat_,XYZ *mol1,XYZ *mol2,int moln1,int moln2);
 	void TM_Align_Get_Matrix(XYZ *mol1,XYZ *mol2,int moln1,int moln2,double d0,double *score);
 	void TM_Align_Get_Matrix_TMs(XYZ *mol1,XYZ *mol2,int moln1,int moln2,double d0,double *score);
-	double TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2);
+	double TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,int NOTM=0);
 	void TM_Align_Get_Ali(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2);
 	void TM_Align_Get_Matrix_MatchWei(XYZ *mol1,XYZ *mol2,int moln1,int moln2,double d0,
 		vector <double> & MatchWei,vector <double> & RetMatrix);

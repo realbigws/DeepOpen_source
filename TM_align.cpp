@@ -7,6 +7,7 @@ TM_align::TM_align(int num)
 	TM_maximal=num;
 	Init_TM_align(TM_maximal);
 	//parameter
+	TM_NOTM=0;       // 0 for NOT use NOTM (i.e., use TMscore to superimpose)
 	TM_GAP_TYPE=0;   // 0 for ordinary; 1 for four-state; -1 for faster (dynaprog bound)//__110730__//
 	TM_GAP_STAGE=2;
 	TM_GAP_OPEN=-0.6;
@@ -555,7 +556,7 @@ void TM_align::TM_Align_Get_Matrix_MatchWei(XYZ *mol1,XYZ *mol2,int moln1,int mo
 //input:  original mol1,moln1 and mol2,moln2; 
 //        their correspondence set, ali2
 //output: TMscore and the score_matrix
-double TM_align::TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2)
+double TM_align::TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,int NOTM)
 {
 	int i;
 	int lali;
@@ -572,8 +573,17 @@ double TM_align::TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int 
 	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
 	if(lali==0)return tmscore;
 	//calculate simple TMscore8
-	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,d0,d8,1,1);
-	tmscore=tmscore/smaller;
+	if(NOTM==1)
+	{
+		kabsch(TM_tmp2,TM_tmp1,lali,finmat);
+		tmscore=Calc_TM_Score_Single(TM_tmp1,TM_tmp2,lali,finmat,d0,d8,0);
+		tmscore=tmscore/smaller;
+	}
+	else
+	{
+		tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,d0,d8,1,1);
+		tmscore=tmscore/smaller;
+	}
 	//calculate score matrix
 	rot_mol(mol1,TM_tmp1,moln1,finmat);
 	if(TM_GAP_TYPE==-1)TM_Align_Get_Matrix_Bound(TM_tmp1,mol2,moln1,moln2,d0,TM_bound,TM_DP_sco); //DynaProg bound//__110720__//
@@ -1066,7 +1076,7 @@ double TM_align::Calc_TM_Align(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2
 	else
 	{
 		if(TM_GAP_TYPE==-1)TM_Align_Get_Ali2_Bound(moln1,moln2,ali2_in,TM_bound,TM_bound_neib);
-		TM_best=TM_Align_Get_Score(mol1,mol2,moln1,moln2,ali2_in);
+		TM_best=TM_Align_Get_Score(mol1,mol2,moln1,moln2,ali2_in,TM_NOTM);
 		if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
 		if(TM_Score_Type==1)TM_best=TM_Align_Get_Score_Simp(mol1,mol2,finmat,moln1,moln2,ali2_in);  //DeepScore type
 		if(TM_best==0.0)goto dp_end;
@@ -1083,7 +1093,7 @@ dp_start:
 		for (id = 1; id <= ITER_NUM; ++id) 
 		{
 			TM_Align_Dyna_Prog(moln1,moln2,TM_DP_sco,TM_DP_ali2,gap_open__,TM_GAP_EXTEND,TM_GAP_TYPE);
-			TM_cur=TM_Align_Get_Score(mol1,mol2,moln1,moln2,TM_DP_ali2);
+			TM_cur=TM_Align_Get_Score(mol1,mol2,moln1,moln2,TM_DP_ali2,TM_NOTM);
 			if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
 			if(TM_Score_Type==1)TM_cur=TM_Align_Get_Score_Simp(mol1,mol2,finmat,moln1,moln2,TM_DP_ali2);  //DeepScore type
 			if(TM_cur>TM_best)
