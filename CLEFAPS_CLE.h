@@ -51,4 +51,6 @@ public:
 	//[main]
 	void CLEFAPS_Main_Init(int SFP_Strategy);
 	double CLEFAPS_Main_Func(vector <Align_Record> &tot);
+	//[mask]
+	int Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, int *mas1, int*mas2);
 };

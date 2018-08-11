@@ -239,6 +239,20 @@ double CLEFAPS_CLE::CLEFAPS_Main_Func(vector <Align_Record> &tot)
 	}
 	SFP_Low.resize(num1);
 	SFP_High.resize(num2);
+	//mask
+	if(mas1!=0 && mas2!=0)
+	{
+		//-> process SFP_Low
+		vector <SFP_Record> SFP_Low_;
+		int num1_=Check_Mask(SFP_Low,SFP_Low_,mas1,mas2);
+		SFP_Low=SFP_Low_;
+		num1=num1_;
+		//-> process SFP_High
+		vector <SFP_Record> SFP_High_;
+		int num2_=Check_Mask(SFP_High,SFP_High_,mas1,mas2);
+		SFP_High=SFP_High_;
+		num2=num2_;
+	}
 	stable_sort(SFP_Low.rbegin(),SFP_Low.rend());   //descending sort
 	stable_sort(SFP_High.rbegin(),SFP_High.rend());
 	//generate alignment
@@ -250,3 +264,33 @@ double CLEFAPS_CLE::CLEFAPS_Main_Func(vector <Align_Record> &tot)
 	if(REF_Strategy==1)maximal=CLEFAPS_Second_Refine(tot);
 	return maximal;
 }
+
+//----- check mask -----//
+int CLEFAPS_CLE::Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, int *mas1, int*mas2)
+{
+	int i,k;
+	int size=(int)in.size();
+	int count=0;
+	out.clear();
+	for(i=0;i<size;i++)
+	{
+		int ii=in[i].ii;
+		int jj=in[i].jj;
+		int len=in[i].winlen;
+		//check mask
+		int conflict=0;
+		for(k=0;k<len;k++)
+		{
+			if(mas1[ii+k]!=mas2[jj+k])conflict++;
+		}
+		if(conflict==0)
+		{
+			out.push_back(in[i]);
+			count++;
+		}
+	}
+	//return
+	return count;
+}
+
+

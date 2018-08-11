@@ -10,6 +10,9 @@ Ali_Ori::Ali_Ori(int num)
 	AFP_tmp1=new XYZ[Ali_Maximal];
 	AFP_tmp2=new XYZ[Ali_Maximal];
 	ALI_CACHE=0; //no cache
+	//-> no mask
+	mas1=0;
+	mas2=0;
 }
 Ali_Ori::~Ali_Ori(void)
 {
@@ -17,6 +20,9 @@ Ali_Ori::~Ali_Ori(void)
 	delete [] Ali_cache;
 	delete [] AFP_tmp1;
 	delete [] AFP_tmp2;
+	//-> no mask
+	if(mas1!=0)delete [] mas1;
+	if(mas2!=0)delete [] mas2;
 }
 
 

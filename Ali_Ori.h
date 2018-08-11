@@ -64,6 +64,7 @@ public:
 //----- data_structure ----//
 public:
 	int *ali1,*ali2;
+	int *mas1,*mas2; //region mask 
 	XYZ *mol1,*mol2;
 	int moln1,moln2;
 	int ALI_CACHE;   //do cache
