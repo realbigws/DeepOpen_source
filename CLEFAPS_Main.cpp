@@ -1846,8 +1846,9 @@ double CLEFAPS_Main::FM_Align_WithAli(XYZ *mol1,XYZ *mol2,int moln1,int moln2,in
 	{
 		memcpy(TM_Main_Ali2,ali2_,moln2*sizeof(int));  //assign the current best path!!
 		tms=TM_Align_TM_Score_Simplest(mol1,mol2,moln1,moln2,TM_Main_Ali2,norm_len,norm_d0,rms,lali);
-
 		rot_mol(mol1,TM_tmp1,moln1,finmat);
+		memcpy(TM_rotmat,finmat,12*sizeof(double));
+		//get bound and dyna_sco
 		TM_Align_Get_Ali2_Bound(moln1,moln2,TM_Main_Ali2,TM_bound,TM_bound_neib);
 		TM_Align_Get_Matrix_Bound(TM_tmp1,mol2,moln1,moln2,norm_d0,TM_bound,TM_DP_sco);
 		TM_CUR=TM_Align_Get_Score_Simp(mol1,mol2,finmat,moln1,moln2,TM_Main_Ali2);  //DeepScore type
@@ -1859,9 +1860,9 @@ double CLEFAPS_Main::FM_Align_WithAli(XYZ *mol1,XYZ *mol2,int moln1,int moln2,in
 			AliT_Max=3;
 		}
 		TM_GAP_TYPE=-1;  //faster DynaProg_bound //__110720__//
-		TM_NOTM=1;
+		//TM_NOTM=1;
 		TM_CUR=Calc_TM_Align(mol1,mol2,moln1,moln2,TM_Main_Ali2,TM_Main_Ali2,-1,REFINE_ITER); //run DynaProg
-		TM_NOTM=0;
+		//TM_NOTM=0;
 		TM_GAP_TYPE=0;   //reset to normal DynaProg //__110720__//
 		if(TM_CUR>TM_BEST)
 		{
