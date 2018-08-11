@@ -20,9 +20,6 @@ Ali_Ori::~Ali_Ori(void)
 	delete [] Ali_cache;
 	delete [] AFP_tmp1;
 	delete [] AFP_tmp2;
-	//-> no mask
-	if(mas1!=0)delete [] mas1;
-	if(mas2!=0)delete [] mas2;
 }
 
 
