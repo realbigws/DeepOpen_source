@@ -68,10 +68,11 @@ public:
 		vector <double> & MatchWei,vector <double> & RetMatrix);
 	//main function
 	double TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
-		int norm_len,double norm_d0,
-		double &rmsd,int &lali,double *MAXSCO=0); //MAXSCO should at least double[8]
+		int norm_len,double norm_d0,double &rmsd,int &lali,double *MAXSCO=0); //MAXSCO should at least double[8]
 	double TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
-		double &rmsd,int &lali,double *MAXSCO=0); //MAXSCO should at least double[8]
+		int norm_len,double norm_d0,double &rmsd,int &lali,double *MAXSCO=0); //MAXSCO should at least double[8]
+	double TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
+		int norm_len,double norm_d0,double &rmsd,int &lali,double *MAXSCO=0); //MAXSCO should at least double[8]
 	//bound function //__110730__//
 	void TM_Align_Get_Bound(int moln1,int moln2,vector<pair<int,int> > &align,
 		vector<pair<int,int> > &bound,int neib);

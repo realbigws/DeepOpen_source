@@ -649,7 +649,7 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 }
 //return simple TMscore (may a little bit smaller than real TMscore, but more efficient!)
 double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
-	double &rmsd,int &lali,double *MAXSCO)
+	int norm_len,double norm_d0,double &rmsd,int &lali,double *MAXSCO)
 {
 	int i;
 	double tmscore=0.0;
@@ -675,13 +675,42 @@ double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,
 		if(lali==0)return tmscore;
 	}
 	//calculate TMscore
-	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,d0,d8,1,1,MAXSCO);
-	tmscore=tmscore/smaller;
+	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,norm_d0,d8,1,1,MAXSCO);
+	tmscore=tmscore/norm_len;
 	//return
 	rmsd=kabsch(TM_tmp2,TM_tmp1,lali,0);
 	if(rmsd>0.0)rmsd=1.0*sqrt(rmsd);
 	return tmscore;
 }
+//return simplest TMscore (just use the raw rotmat)
+double TM_align::TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
+	int norm_len,double norm_d0,double &rmsd,int &lali,double *MAXSCO)
+{
+	int i;
+	double tmscore=0.0;
+	//init judge
+	int smaller=moln1<moln2?moln1:moln2;
+	if(smaller==0)
+	{
+		rmsd=0.0;
+		lali=0;
+		for(i=0;i<moln2;i++)ali2[i]=-1;
+		return tmscore;
+	}
+	if(TM_CALC==0)Calc_TM_d0(smaller);
+	//get correspondece
+	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
+	if(lali==0)return tmscore;
+	//rotate TM_tmp1 to TM_tmp2
+	rmsd=kabsch(TM_tmp2,TM_tmp1,lali,finmat);
+	if(rmsd>0.0)rmsd=1.0*sqrt(rmsd);
+	tmscore=Calc_TM_Score_Single(TM_tmp1,TM_tmp2,lali,finmat,norm_d0,d8,0,MAXSCO);
+	tmscore=tmscore/norm_len;
+	//return
+	return tmscore;
+}
+
+
 
 //================ bound functions =================//__110730__//
 void TM_align::TM_Align_Get_Bound(int moln1,int moln2,vector<pair<int,int> > &align,
