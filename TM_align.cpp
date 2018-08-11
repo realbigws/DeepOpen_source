@@ -650,6 +650,7 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
 	double &rmsd,int &lali,double *MAXSCO)
 {
+	int smaller=moln1<moln2?moln1:moln2;
 	return TM_Align_TM_Score(mol1,mol2,moln1,moln2,ali2,smaller,d0,rmsd,lali,MAXSCO);
 }
 //return simple TMscore (may a little bit smaller than real TMscore, but more efficient!)
@@ -690,6 +691,7 @@ double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,
 double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
 	double &rmsd,int &lali,double *MAXSCO)
 {
+	int smaller=moln1<moln2?moln1:moln2;
 	return TM_Align_TM_Score_Simp(mol1,mol2,moln1,moln2,ali2,smaller,d0,rmsd,lali,MAXSCO);
 }
 //return simplest TMscore (just use the raw rotmat)
@@ -722,6 +724,7 @@ double TM_align::TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int mo
 double TM_align::TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
 	double &rmsd,int &lali,double *MAXSCO)
 {
+	int smaller=moln1<moln2?moln1:moln2;
 	return TM_Align_TM_Score_Simplest(mol1,mol2,moln1,moln2,ali2,smaller,d0,rmsd,lali,MAXSCO);
 }
 
