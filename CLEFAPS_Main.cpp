@@ -1845,7 +1845,7 @@ double CLEFAPS_Main::FM_Align_WithAli(XYZ *mol1,XYZ *mol2,int moln1,int moln2,in
 	FM_align_tot.clear();
 	{
 		memcpy(TM_Main_Ali2,ali2_,moln2*sizeof(int));  //assign the current best path!!
-		tms=TM_Align_TM_Score(mol1,mol2,moln1,moln2,TM_Main_Ali2,norm_len,norm_d0,rms,lali);
+		tms=TM_Align_TM_Score_Simplest(mol1,mol2,moln1,moln2,TM_Main_Ali2,norm_len,norm_d0,rms,lali);
 		TM_GAP_TYPE=-1;  //faster DynaProg_bound //__110720__//
 		TM_CUR=Calc_TM_Align(mol1,mol2,moln1,moln2,TM_Main_Ali2,TM_Main_Ali2,1);  //just calc score
 		TM_GAP_TYPE=0;   //reset to normal DynaProg //__110720__//
