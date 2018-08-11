@@ -1859,7 +1859,9 @@ double CLEFAPS_Main::FM_Align_WithAli(XYZ *mol1,XYZ *mol2,int moln1,int moln2,in
 			AliT_Max=3;
 		}
 		TM_GAP_TYPE=-1;  //faster DynaProg_bound //__110720__//
+		TM_NOTM=1;
 		TM_CUR=Calc_TM_Align(mol1,mol2,moln1,moln2,TM_Main_Ali2,TM_Main_Ali2,-1,REFINE_ITER); //run DynaProg
+		TM_NOTM=0;
 		TM_GAP_TYPE=0;   //reset to normal DynaProg //__110720__//
 		if(TM_CUR>TM_BEST)
 		{
