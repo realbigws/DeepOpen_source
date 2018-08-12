@@ -283,7 +283,7 @@ int CLEFAPS_CLE::Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, i
 		{
 			if(mas1[ii+k]!=mas2[jj+k])conflict++;
 		}
-		if(conflict==0)
+		if(1.0*conflict/len<0.5)
 		{
 			out.push_back(in[i]);
 			count++;
@@ -292,5 +292,4 @@ int CLEFAPS_CLE::Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, i
 	//return
 	return count;
 }
-
 
