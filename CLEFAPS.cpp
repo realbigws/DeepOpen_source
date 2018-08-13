@@ -292,18 +292,15 @@ int CLEFAPS::Select_Single(int cur_SFP,int recur,double INI_CUT,double FIN_CUT,v
 {
 	int ii,jj,winlen;
 	double RMSD;
-	int ret_val;
 	int wsscore;
 	//init
 	ii=SFP[cur_SFP].ii;
 	jj=SFP[cur_SFP].jj;
 	winlen=SFP[cur_SFP].winlen;
 	//pivot
-	RMSD=make_center(ii,jj,winlen,ret_rot,mol1,mol2,moln1,moln2);
-	if(RMSD<0.0 || RMSD>INI_CUT*INI_CUT)return -1;
+	if(make_center(ii,jj,winlen,rot_mat,mol1,mol2,moln1,moln2)<0.0)return -1;
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);
-	ret_val=ZoomIn_Add(recur,INI_CUT,FIN_CUT,SFP,ret_rot);
-	if(ret_val<0)return -1;
+	if(ZoomIn_Add(recur,INI_CUT,FIN_CUT,SFP,ret_rot)<0)return -1;
 	if(NonLinear==1)Kill_NonLinear(ret_rot);
 	Final_Rot_Ali(ret_rot,RMSD,mol1,mol2,moln1,moln2,ali1,ali2);
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);

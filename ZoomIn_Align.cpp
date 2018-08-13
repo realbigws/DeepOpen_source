@@ -421,7 +421,7 @@ int ZoomIn_Align::Select_Single(int cur_SFP,int recur,double INI_CUT,double FIN_
 	winlen=sfp_rec.winlen;
 	//pivot
 	if(make_center(ii,jj,winlen,rot_mat,mol1,mol2,moln1,moln2)<0.0)return -1;
-	wsscore=ZoomIn_Add(recur,INI_CUT,FIN_CUT,SFP);
+	if(ZoomIn_Add(recur,INI_CUT,FIN_CUT,SFP)<0)return -1;
 	AFP_Kill_NonLinear(AFP_Cor,AFP_Cor_temp,rot_mat);
 	AFP_kabsch(rot_mat,RMSD,mol1,mol2,moln1,moln2,AFP_Cor);
 	wsscore=(int)T_Similar(rot_mat,ali1,ali2);
