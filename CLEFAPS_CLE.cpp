@@ -19,7 +19,7 @@ CLEFAPS_CLE::CLEFAPS_CLE(int num,int CLESUM)
 	WS_Refine_Cut=0.3; //only TM_refine 0.3*max
 	//upper and lower max
 	ZM_Upper_Max=500;
-	ZM_Lower_Max=50;
+	ZM_Lower_Max=100;
 	ZM_TopL=10;
 }
 CLEFAPS_CLE::~CLEFAPS_CLE(void)
