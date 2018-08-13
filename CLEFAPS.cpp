@@ -298,7 +298,7 @@ int CLEFAPS::Select_Single(int cur_SFP,int recur,double INI_CUT,double FIN_CUT,v
 	jj=SFP[cur_SFP].jj;
 	winlen=SFP[cur_SFP].winlen;
 	//pivot
-	if(make_center(ii,jj,winlen,rot_mat,mol1,mol2,moln1,moln2)<0.0)return -1;
+	if(make_center(ii,jj,winlen,ret_rot,mol1,mol2,moln1,moln2)<0.0)return -1;
 	if(ALI_CACHE==1)memset(Ali_cache,0,sizeof(int)*moln1);
 	if(ZoomIn_Add(recur,INI_CUT,FIN_CUT,SFP,ret_rot)<0)return -1;
 	if(NonLinear==1)Kill_NonLinear(ret_rot);
