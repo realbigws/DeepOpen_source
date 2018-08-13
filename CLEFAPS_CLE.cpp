@@ -278,14 +278,38 @@ int CLEFAPS_CLE::Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, i
 		int jj=in[i].jj;
 		int len=in[i].winlen;
 		//check mask
-		int conflict=0;
+		int neo_ii=-1;
+		int neo_jj=-1;
+		int neo_len=0;
+		int valid_len=0;
 		for(k=0;k<len;k++)
 		{
-			if(mas1[ii+k]!=mas2[jj+k])conflict++;
+			if(mas1[ii+k]==mas2[jj+k])valid_len++;
+			else
+			{
+				if(valid_len>neo_len)
+				{
+					neo_len=valid_len;
+					neo_ii=ii+k-neo_len;
+					neo_jj=jj+k-neo_len;
+				}
+				valid_len=0;
+			}
 		}
-		if(1.0*conflict/len<0.5)
+		if(valid_len>neo_len)
 		{
-			out.push_back(in[i]);
+			neo_len=valid_len;
+			neo_ii=ii+k-neo_len;
+			neo_jj=jj+k-neo_len;
+		}
+		//push_back
+		if(neo_len>0)
+		{
+			SFP_Record neo=in[i];
+			neo.ii=neo_ii;
+			neo.jj=neo_jj;
+			neo.winlen=neo_len;
+			out.push_back(neo);
 			count++;
 		}
 	}
