@@ -343,7 +343,8 @@ double TM_align::TM_Align_Get_Score_Part_Rmsd(XYZ *mol1,XYZ *mol2,double *rotmat
 		ws_sco+=dist2;
 		lali++;
 	}
-	return 1.0*sqrt(1.0*ws_sco/lali);
+	if(lali>0)return 1.0*sqrt(1.0*ws_sco/lali);
+	else return 0;
 }
 
 //====================== minor functions ====================//
@@ -573,7 +574,7 @@ double TM_align::TM_Align_Get_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int 
 	if(TM_CALC==0)Calc_TM_d0(smaller);
 	//get correspondece
 	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
-	if(lali==0)return tmscore;
+	if(lali<=1)return tmscore;
 	//calculate simple TMscore8
 	if(NOTM==1)
 	{
@@ -642,7 +643,7 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 	if(TM_CALC==0)Calc_TM_d0(smaller);
 	//get correspondece
 	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
-	if(lali==0)return tmscore;
+	if(lali<=1)return tmscore;
 	//calculate TMscore8
 	if(TM_DIST_CUT==1)
 	{
@@ -651,7 +652,7 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 		//remove dis>d8 in normal TM-score calculation for final report----->
 		if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
 		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,TM_DistCut,finmat);
-		if(lali==0)return tmscore;
+		if(lali<=1)return tmscore;
 	}
 	//calculate TMscore
 	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,norm_d0,d8,0,0,MAXSCO);
@@ -686,14 +687,14 @@ double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,
 	if(TM_CALC==0)Calc_TM_d0(smaller);
 	//get correspondece
 	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
-	if(lali==0)return tmscore;
+	if(lali<=1)return tmscore;
 	//calculate TMscore8
 	if(TM_DIST_CUT==1)
 	{
 		//remove dis>d8 in normal TM-score calculation for final report----->
 		if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
 		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,TM_DistCut,finmat);
-		if(lali==0)return tmscore;
+		if(lali<=1)return tmscore;
 	}
 	//calculate TMscore
 	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,norm_d0,d8,1,1,MAXSCO);
@@ -728,7 +729,7 @@ double TM_align::TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int mo
 	if(TM_CALC==0)Calc_TM_d0(smaller);
 	//get correspondece
 	lali=TM_Align_Get_XYZ(mol1,mol2,moln1,moln2,ali2);
-	if(lali==0)return tmscore;
+	if(lali<=1)return tmscore;
 	//rotate TM_tmp1 to TM_tmp2
 	rmsd=kabsch(TM_tmp2,TM_tmp1,lali,finmat);
 	if(rmsd>0.0)rmsd=1.0*sqrt(rmsd);

@@ -658,21 +658,21 @@ double Kabsch::InnerProduct(double *A, XYZ *coords1, XYZ *coords2, XYZ &cen1, XY
 	//---- ws_modify ----//
     if (weight != NULL)
     {
-		//cent
-        wsum1 = 0.0;
-		wsum2 = 0.0;
+	//cent
+	wsum1 = 0.0;
+	wsum2 = 0.0;
         for (i = 0; i < len; ++i)
         {
 			//cent1
 			xsum1 += weight[i] * coords1[i].X;
 			ysum1 += weight[i] * coords1[i].Y;
 			zsum1 += weight[i] * coords1[i].Z;
-            wsum1 += weight[i];
+			wsum1 += weight[i];
 			//cent2
 			xsum2 += weight[i] * coords2[i].X;
 			ysum2 += weight[i] * coords2[i].Y;
 			zsum2 += weight[i] * coords2[i].Z;
-            wsum2 += weight[i];
+			wsum2 += weight[i];
         }
         xsum1 /= wsum1;
         ysum1 /= wsum1;
@@ -684,10 +684,10 @@ double Kabsch::InnerProduct(double *A, XYZ *coords1, XYZ *coords2, XYZ &cen1, XY
 		//cross
         for (i = 0; i < len; ++i)
         {
-			x1 = coords1[i].X - xsum1;
+            x1 = coords1[i].X - xsum1;
             y1 = coords1[i].Y - ysum1;
             z1 = coords1[i].Z - zsum1;
-			G1 += weight[i] * (x1 * x1 + y1 * y1 + z1 * z1);
+            G1 += weight[i] * (x1 * x1 + y1 * y1 + z1 * z1);
 
             x2 = coords2[i].X - xsum2;
             y2 = coords2[i].Y - ysum2;
@@ -731,7 +731,7 @@ double Kabsch::InnerProduct(double *A, XYZ *coords1, XYZ *coords2, XYZ &cen1, XY
 		//cross
         for (i = 0; i < len; ++i)
         {
-			x1 = coords1[i].X - xsum1;
+            x1 = coords1[i].X - xsum1;
             y1 = coords1[i].Y - ysum1;
             z1 = coords1[i].Z - zsum1;
             G1 += (x1 * x1 + y1 * y1 + z1 * z1);
@@ -943,8 +943,8 @@ double Kabsch::CalcRMSDRotationalMatrix(XYZ *coords1, XYZ *coords2, int len, dou
 {
 	double A[9], rmsd;
 	XYZ cen1,cen2;
-    /* calculate the (weighted) inner product of two structures */
-    double E0 = InnerProduct(A, coords1, coords2, cen1, cen2, len, weight);
+	/* calculate the (weighted) inner product of two structures */
+	double E0 = InnerProduct(A, coords1, coords2, cen1, cen2, len, weight);
 	/* calculate the RMSD & rotational matrix */
 	FastCalcRMSDAndRotation(rot, A, &rmsd, E0, len, -1);
 
@@ -975,12 +975,5 @@ double Kabsch::CalcRMSDRotationalMatrix(XYZ *coords1, XYZ *coords2, int len, dou
 	//final return
 	return rmsd;
 }
-
-
-
-
-
-
-
 
 
