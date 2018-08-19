@@ -20,6 +20,7 @@ public:
 	double TM_GAP_OPEN;   //TM_GAP_OPEN [-0.6]
 	double TM_GAP_EXTEND; //TM_GAP_EXTEND [0.0]
 	int TM_DIST_CUT;      //cut those dist > d8 (default: CUT)
+	double TM_DistCut;    //TM_DistCut value, default=d8
 	int TM_Score_Type;    //[0,1] -> score type (0 for TMscore, 1 for DeepScore)
 //---- variables ----//
 public:

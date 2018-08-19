@@ -13,6 +13,7 @@ TM_align::TM_align(int num)
 	TM_GAP_OPEN=-0.6;
 	TM_GAP_EXTEND=0.0;
 	TM_DIST_CUT=1;
+	TM_DistCut=10.0; // equal to d8 in TMscore
 	//DynaProg_bound//__110730__//
 	TM_bound_neib=4;
 	//TMali_Weight//__110830__//
@@ -57,6 +58,7 @@ void TM_align::TM_Align_Init(int moln1,int moln2)
 {
 	int smaller=moln1<moln2?moln1:moln2;
 	Calc_TM_d0(smaller);
+	TM_DistCut=d8;
 	TM_bound.resize(moln1+1);
 	TM_CALC=1;
 }
@@ -627,12 +629,13 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 	int i;
 	double tmscore8;
 	double tmscore=0.0;
+	rmsd=0;
+	lali=0;
+	if(MAXSCO!=NULL)for(int wwi=0;wwi<8;wwi++)MAXSCO[wwi]=0;
 	//init judge
 	int smaller=moln1<moln2?moln1:moln2;
 	if(smaller==0)
 	{
-		rmsd=0.0;
-		lali=0;
 		for(i=0;i<moln2;i++)ali2[i]=-1;
 		return tmscore;
 	}
@@ -647,7 +650,8 @@ double TM_align::TM_Align_TM_Score(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *
 		tmscore8=tmscore8/smaller;
 		//remove dis>d8 in normal TM-score calculation for final report----->
 		if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
-		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,d8,finmat);
+		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,TM_DistCut,finmat);
+		if(lali==0)return tmscore;
 	}
 	//calculate TMscore
 	tmscore=Calc_TM_Score(TM_tmp1,TM_tmp2,lali,norm_d0,d8,0,0,MAXSCO);
@@ -669,12 +673,13 @@ double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,
 {
 	int i;
 	double tmscore=0.0;
+	rmsd=0;
+	lali=0;
+	if(MAXSCO!=NULL)for(int wwi=0;wwi<8;wwi++)MAXSCO[wwi]=0;
 	//init judge
 	int smaller=moln1<moln2?moln1:moln2;
 	if(smaller==0)
 	{
-		rmsd=0.0;
-		lali=0;
 		for(i=0;i<moln2;i++)ali2[i]=-1;
 		return tmscore;
 	}
@@ -687,7 +692,7 @@ double TM_align::TM_Align_TM_Score_Simp(XYZ *mol1,XYZ *mol2,int moln1,int moln2,
 	{
 		//remove dis>d8 in normal TM-score calculation for final report----->
 		if(TM_CACHE==1)memset(TMs_cache,0,sizeof(int)*moln1);
-		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,d8,finmat);
+		lali=TM_Align_Get_CUT(mol1,mol2,moln1,moln2,ali2,TM_DistCut,finmat);
 		if(lali==0)return tmscore;
 	}
 	//calculate TMscore
@@ -710,12 +715,13 @@ double TM_align::TM_Align_TM_Score_Simplest(XYZ *mol1,XYZ *mol2,int moln1,int mo
 {
 	int i;
 	double tmscore=0.0;
+	rmsd=0;
+	lali=0;
+	if(MAXSCO!=NULL)for(int wwi=0;wwi<8;wwi++)MAXSCO[wwi]=0;
 	//init judge
 	int smaller=moln1<moln2?moln1:moln2;
 	if(smaller==0)
 	{
-		rmsd=0.0;
-		lali=0;
 		for(i=0;i<moln2;i++)ali2[i]=-1;
 		return tmscore;
 	}
