@@ -53,4 +53,5 @@ public:
 	double CLEFAPS_Main_Func(vector <Align_Record> &tot);
 	//[mask]
 	int Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, int *mas1, int*mas2);
+	void Mask_CLE_BreakPoint(char *CLE, int *mask, int len);
 };

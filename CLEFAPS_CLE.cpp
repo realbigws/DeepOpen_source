@@ -43,6 +43,13 @@ void CLEFAPS_CLE::CLEFAPS_Input_Func(char *c1,char *c2,char *a1,char *a2,
 	mol2=m2;
 	moln1=n1;
 	moln2=n2;
+	//mask check for CLE
+	if(mas1!=0 && mas2!=0)
+	{
+		//-> mask the break point 
+		Mask_CLE_BreakPoint(IN_CLE1,mas1,moln1);
+		Mask_CLE_BreakPoint(IN_CLE2,mas2,moln2);
+	}
 }
 void CLEFAPS_CLE::CLEFAPS_Input_Para(int h_len,int l_len,int h_thres,int l_thres,int Stragety)
 {
@@ -315,5 +322,26 @@ int CLEFAPS_CLE::Check_Mask(vector <SFP_Record> &in, vector <SFP_Record> &out, i
 	}
 	//return
 	return count;
+}
+
+//----- mask CLE at the break point -----//
+//-> example
+/*
+        RREADFAGSLAAKHHHHHHR
+        11111111122222222222
+        RREADFAGRRRAKHHHHHHR
+*/
+void CLEFAPS_CLE::Mask_CLE_BreakPoint(char *CLE, int *mask, int len)
+{
+	int i;
+	for(i=0;i<len-3;i++)
+	{
+		if(mask[i]!=mask[i+1] && mask[i+1]==mask[i+2])	
+		{
+			CLE[i]='R';
+			CLE[i+1]='R';
+			CLE[i+2]='R';
+		}
+	}
 }
 
