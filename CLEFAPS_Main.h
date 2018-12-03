@@ -10,7 +10,7 @@ using namespace std;
 class CLEFAPS_Main :  public Envo_Align, public CLEFAPS_CLE, public TM_Align_Main
 {
 public:
-	CLEFAPS_Main(int num=3000,int CLESUM=1);
+	CLEFAPS_Main(int num=PROT_MAX_NUM,int CLESUM=1);
 	~CLEFAPS_Main(void);
 
 	//---------- data structure ------------//

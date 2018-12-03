@@ -6,7 +6,7 @@ using namespace std;
 class TM_Align_Main : virtual public TM_align
 {
 public:
-	TM_Align_Main(int num=3000);
+	TM_Align_Main(int num=PROT_MAX_NUM);
 	~TM_Align_Main(void);
 	int TMM_maximal;
 

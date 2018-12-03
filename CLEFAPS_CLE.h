@@ -12,7 +12,7 @@ using namespace std;
 class CLEFAPS_CLE : public CLEFAPS, virtual public Bioinfo_Code
 {
 public:
-	CLEFAPS_CLE(int num=3000,int CLESUM=1);
+	CLEFAPS_CLE(int num=PROT_MAX_NUM,int CLESUM=1);
 	~CLEFAPS_CLE(void);
 
 //---- variables ----//

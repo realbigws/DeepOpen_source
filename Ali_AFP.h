@@ -45,7 +45,7 @@ OTHER RIGHTS.
 class Ali_AFP : virtual public Ali_Ori
 {
 public:
-	Ali_AFP(int num=3000);
+	Ali_AFP(int num=PROT_MAX_NUM);
 	~Ali_AFP(void);
 	int Ali_AFP_Maximal;
 

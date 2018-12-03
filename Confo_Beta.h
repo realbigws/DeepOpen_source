@@ -7,7 +7,7 @@
 class Confo_Beta
 {
 public:
-	Confo_Beta(int num=3000);
+	Confo_Beta(int num=PROT_MAX_NUM);
 	~Confo_Beta(void);
 	int Confo_Beta_Maximal; 
 
