@@ -11,7 +11,7 @@ using namespace std;
 class ZoomIn_Align : public Ali_Ali3, public Ali_AFP, virtual public TM_align
 {
 public:
-	ZoomIn_Align(int num=3000);
+	ZoomIn_Align(int num=PROT_MAX_NUM);
 	~ZoomIn_Align(void);
 	int ZoomIn_Maximal;
 

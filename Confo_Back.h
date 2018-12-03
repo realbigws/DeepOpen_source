@@ -6,7 +6,7 @@
 class Confo_Back : public Confo_Lett
 {
 public:
-	Confo_Back(int num=3000);
+	Confo_Back(int num=PROT_MAX_NUM);
 	~Confo_Back(void);
 	int Confo_Back_Maximal;
 
