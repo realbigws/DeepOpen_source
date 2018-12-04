@@ -51,7 +51,7 @@ public:
 	//[1] Zhang Yang original TMalign version (2009+2010)
 	double TM_Align_Total(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
 		int norm_len,double norm_d0,double *MAXSCO=0); //MAXSCO should at least double[8]
-	//[2] WS modified TMalign, only change the order of initial alignment
+	//[2] modified TMalign, only change the order of initial alignment
 	double TM_Align_Total_II(XYZ *mol1,XYZ *mol2,int moln1,int moln2,int *ali2,
 		int norm_len,double norm_d0,double *MAXSCO=0);
 };

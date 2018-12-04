@@ -19,17 +19,17 @@ public:
 public:
 	//macro
 	int SFP_Strategy;    //-> using CLE,AMI,GEN or CLE+AMI to generate SFP
-	int REF_Strategy;    //
+	int REF_Strategy;    //-> using refinement strategy
 	//parameter
 	int SFP_H_Len;
 	int SFP_L_Len;
 	int SFP_H_Thres;
 	int SFP_L_Thres;
 	//additional
-	int ZM_Upper_Max;     //-> default is 500
-	int ZM_Lower_Max;     //-> default is 50
-	int ZM_TopL;          //-> retain TopL candidate for TMscore refinement
-	double WS_Refine_Cut; //-> TM_refine cutoff (default: 0.3)
+	int ZM_Upper_Max;    //-> default is 500
+	int ZM_Lower_Max;    //-> default is 50
+	int ZM_TopL;         //-> retain TopL candidate for TMscore refinement
+	double Refine_Cut;   //-> TM_refine cutoff (default: 0.3)
 	//structure
 	char *IN_CLE1;
 	char *IN_CLE2;

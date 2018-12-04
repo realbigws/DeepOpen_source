@@ -53,7 +53,7 @@ void Hydro_Bond::HB_Input_Mol(XYZ **mol,char *ami,int moln)
 	//----- create H atom ------//
 	for(i=0;i<HB_moln-1;i++)
 	{
-		//---- WS_Modify ----//__100718__//
+		//---- Modify ----//__100718__//
 		//proline has no backbone hydrogen atom!!
 		//so we may neglect the dihetral angle calculation!!
 		if(HB_ami[i+1]!='P')

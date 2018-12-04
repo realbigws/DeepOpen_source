@@ -51,7 +51,7 @@ public:
 
 //----- create & delete ----//
 public:
-	void AFP_Create_Linear(int WS_MAX_DIM);
+	void AFP_Create_Linear(int IN_MAX_DIM);
 	void AFP_Delete_Linear(void);
 
 //--------------------------------//
